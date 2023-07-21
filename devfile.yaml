@@ -94,7 +94,7 @@ components:
 commands:
   - id: debug
     exec:
-      label: "Package and start the application in debug mode."
+      label: "Build and run the application in debug mode."
       component: wildfly
       commandLine: mvn ${MVN_ARGS_APPEND} -Pprovisioned-server -Dwildfly.javaOpts="-Djboss.node.name=${NODE_NAME} -agentlib:jdwp=transport=dt_socket,address=0.0.0.0:${DEBUG_PORT},server=y,suspend=n" clean package org.wildfly.plugins:wildfly-maven-plugin:dev
       workingDir: ${PROJECT_SOURCE}
@@ -104,7 +104,7 @@ commands:
         isDefault: true
   - id: package
     exec:
-      label: "Build the application."
+      label: "Package the application."
       component: wildfly
       commandLine: mvn ${MVN_ARGS_APPEND} -Pprovisioned-server clean package
       workingDir: ${PROJECT_SOURCE}
