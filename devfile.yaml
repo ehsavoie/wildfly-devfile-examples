@@ -149,7 +149,7 @@ commands:
     exec:
       label: "Che outer-loop 2-Login into OpenShift registry."
       component: tools
-      commandLine: podman login --tls-verify=false -u kubeadmin -p $(oc whoami -t) ${OPENSHIFT_IMAGE_REGISTRY} && oc login --token=$(oc whoami -t)
+      commandLine: docker login --tls-verify=false -u kubeadmin -p $(oc whoami -t) ${OPENSHIFT_IMAGE_REGISTRY} && oc login --token=$(oc whoami -t)
       workingDir: ${PROJECT_SOURCE}
       group:
         kind: build
@@ -158,7 +158,7 @@ commands:
     exec:
       label: "Che outer-loop 3-Build Runtime Image for Openshift."
       component: tools
-      commandLine: "export OPENSHIFT_NS=$(oc project -q) && podman build -f Containerfile -t ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE} ."
+      commandLine: "export OPENSHIFT_NS=$(oc project -q) && docker build -f Containerfile -t ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE} ."
       workingDir: ${PROJECT_SOURCE}
       group:
         kind: build
@@ -168,7 +168,7 @@ commands:
       label: "Che outer-loop 4-Push Image into OpenShift registry."
       component: tools
       workingDir: ${PROJECT_SOURCE}
-      commandLine: "export OPENSHIFT_NS=$(oc project -q) && podman tag ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE} ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE}:latest && podman push --tls-verify=false ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE}:latest"
+      commandLine: "export OPENSHIFT_NS=$(oc project -q) && docker tag ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE} ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE}:latest && docker push --tls-verify=false ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE}:latest"
       group:
         kind: build
         isDefault: false
