@@ -21,8 +21,9 @@ starterProjects:
 components:
   - name: tools
     container:
-     # image: quay.io/devfile/universal-developer-image:ubi8-latest
-      image: quay.io/mloriedo/universal-developer-image:kubedock
+     # image: quay.io/devfile/universal-developer-image:ubi8-acf09eb
+     # image: quay.io/mloriedo/universal-developer-image:kubedock
+      image:  quay.io/devfile/universal-developer-image:ubi8-c0b5f15
       memoryLimit: 1512Mi
       mountSources: true
       env:
@@ -30,6 +31,8 @@ components:
           value: "image-registry.openshift-image-registry.svc:5000"
         - name: IMAGE
           value: "numberguess"
+        - name: KUBEDOCK_ENABLED
+          value: "false"
   - name: wildfly
     container:
       image: quay.io/wildfly/wildfly-s2i:latest-jdk17
@@ -148,7 +151,7 @@ commands:
         isDefault: false
   - id: openshift-registry-login
     exec:
-      label: "Che outer-loop 2-Login into OpenShift registry."
+      label: "Che outer-loop 2 - Login into OpenShift registry."
       component: tools
       commandLine: podman login --tls-verify=false -u kubeadmin -p $(oc whoami -t) ${OPENSHIFT_IMAGE_REGISTRY} && oc login --token=$(oc whoami -t)
       workingDir: ${PROJECT_SOURCE}
@@ -157,7 +160,7 @@ commands:
         isDefault: false
   - id: build-runtime-image
     exec:
-      label: "Che outer-loop 3-Build Runtime Image for Openshift."
+      label: "Che outer-loop 3 - Build Runtime Image for Openshift."
       component: tools
       commandLine: "export OPENSHIFT_NS=$(oc project -q) && podman build -f Containerfile -t ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE} ."
       workingDir: ${PROJECT_SOURCE}
@@ -166,7 +169,7 @@ commands:
         isDefault: false
   - id: push-image
     exec:
-      label: "Che outer-loop 4-Push Image into OpenShift registry."
+      label: "Che outer-loop 4 - Push Image into OpenShift registry."
       component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: "export OPENSHIFT_NS=$(oc project -q) && podman tag ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE} ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE}:latest && podman push --tls-verify=false ${OPENSHIFT_IMAGE_REGISTRY}/${OPENSHIFT_NS}/${IMAGE}:latest"
@@ -175,7 +178,7 @@ commands:
         isDefault: false
   - id: deploy-image
     exec:
-      label: "Che outer-loop 5-Deploy Image into OpenShift."
+      label: "Che outer-loop 5 - Deploy Image into OpenShift."
       component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: "helm repo add wildfly https://docs.wildfly.org/wildfly-charts/ && oc set image-lookup ${IMAGE} && helm install ${IMAGE} -f charts/helm.yaml --set build.enabled=false --set image.name=${IMAGE} wildfly/wildfly"
@@ -184,7 +187,7 @@ commands:
         isDefault: false
   - id: undeploy-image
     exec:
-      label: "Che outer-loop 6-Undeploy Image from OpenShift."
+      label: "Che outer-loop 6 - Undeploy Image from OpenShift."
       component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: "helm uninstall ${IMAGE}"
